@@ -59,6 +59,13 @@ class ErrorResponseTest {
     }
 
     @Test
+    void "should create response from null error message"() {
+        def resp = ErrorResponse.create(null)
+        assert resp.code == ""
+        assert resp.message == ""
+    }
+
+    @Test
     void "should create response from error message with few delimiters"() {
         def resp = ErrorResponse.create("CODE|Message|Message2")
         assert resp.code == "CODE"

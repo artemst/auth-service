@@ -10,6 +10,8 @@ import ru.astepanov.authservice.model.register.RegisterRequest;
 import ru.astepanov.authservice.model.register.RegisterResponse;
 import ru.astepanov.authservice.model.register.RegisterResult;
 
+import javax.validation.Valid;
+
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
@@ -22,7 +24,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class AuthControllerV1 {
 
     @RequestMapping(method = POST, path = "register")
-    public RegisterResponse register(@RequestBody RegisterRequest request) {
+    public RegisterResponse register(@Valid @RequestBody RegisterRequest request) {
         log.info("Attempt to register account with data: {}", request);
 
         if (request.getPassword() != null) {
@@ -33,7 +35,7 @@ public class AuthControllerV1 {
     }
 
     @RequestMapping(method = POST, path = "login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         log.info("Attempt to login into account with data: {}", request);
 
         if (request.getPassword() != null) {
