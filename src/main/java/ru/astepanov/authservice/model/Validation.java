@@ -6,9 +6,9 @@ package ru.astepanov.authservice.model;
  */
 public interface Validation {
 
-    /** Min length of SHA256 */
-    int MIN_PASSWORD_LENGTH = 64;
-    /** Max length of SHA256 */
-    int MAX_PASSWORD_LENGTH = 64;
+    /** Min length of SHA256 from password */
+    int MIN_PASS_LENGTH = 64;
+    /** Max length of SHA256 from password */
+    int MAX_PASS_LENGTH = 64;
 
 }

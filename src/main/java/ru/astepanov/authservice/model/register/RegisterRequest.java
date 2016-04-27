@@ -10,8 +10,8 @@ import ru.astepanov.authservice.model.AuthProvider;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import static ru.astepanov.authservice.model.Validation.MAX_PASSWORD_LENGTH;
-import static ru.astepanov.authservice.model.Validation.MIN_PASSWORD_LENGTH;
+import static ru.astepanov.authservice.model.Validation.MAX_PASS_LENGTH;
+import static ru.astepanov.authservice.model.Validation.MIN_PASS_LENGTH;
 
 /**
  * @author Artemiy Stepanov (artem.omsk@gmail.com)
@@ -22,17 +22,16 @@ import static ru.astepanov.authservice.model.Validation.MIN_PASSWORD_LENGTH;
 public class RegisterRequest {
 
     /** В качестве логина передается email пользователя */
-    @NotBlank(message = "INVALID_LOGIN|Некорректное значения параметра login")
-    @Email(message = "INVALID_LOGIN|Некорректное значения параметра login")
+    @NotBlank(message = "INVALID_LOGIN")
+    @Email(message = "INVALID_LOGIN")
     private String login;
 
     /** Передается хэш SHA256 от пользовательского пароля */
-    @NotBlank(message = "INVALID_PASSWORD|Некорректное значение параметра password")
-    @Size(min = MIN_PASSWORD_LENGTH, max = MAX_PASSWORD_LENGTH,
-        message = "INVALID_PASSWORD|Некорректное значение параметра password")
+    @NotBlank(message = "INVALID_PASSWORD")
+    @Size(min = MIN_PASS_LENGTH, max = MAX_PASS_LENGTH, message = "INVALID_PASSWORD")
     private String password;
 
-    @NotNull(message = "INVALID_PROVIDER|Некорректное значение параметра provider")
+    @NotNull(message = "INVALID_PROVIDER")
     private AuthProvider provider;
 
 }
