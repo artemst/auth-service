@@ -22,16 +22,16 @@ import static ru.astepanov.authservice.model.Validation.MIN_PASS_LENGTH;
 public class RegisterRequest {
 
     /** В качестве логина передается email пользователя */
-    @NotBlank(message = "INVALID_LOGIN")
+    @NotBlank(message = "LOGIN_IS_EMPTY")
     @Email(message = "INVALID_LOGIN")
     private String login;
 
     /** Передается хэш SHA256 от пользовательского пароля */
-    @NotBlank(message = "INVALID_PASSWORD")
+    @NotBlank(message = "PASSWORD_IS_EMPTY")
     @Size(min = MIN_PASS_LENGTH, max = MAX_PASS_LENGTH, message = "INVALID_PASSWORD")
     private String password;
 
-    @NotNull(message = "INVALID_PROVIDER")
+    @NotNull(message = "PROVIDER_ID_EMPTY")
     private AuthProvider provider;
 
 }
