@@ -1,7 +1,6 @@
 package ru.astepanov.authservice.controller
 
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -12,8 +11,8 @@ import org.springframework.validation.BindingResult
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
 
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.when
+import static org.mockito.Mockito.*
+import static org.springframework.context.i18n.LocaleContextHolder.locale
 
 /**
  * @author Artemiy Stepanov (artem.omsk@gmail.com)
@@ -24,38 +23,65 @@ class ControllerValidationHandlerTest {
 
     def ControllerValidationHandler handler
     @Mock
-    def MessageSource messageSource
+    def MessageSource msgSource
 
     @Before
     public void setUp() throws Exception {
-        handler = new ControllerValidationHandler()
-        handler.messageSource = messageSource
+        handler = new ControllerValidationHandler(messageSource: msgSource)
     }
 
     @Test
-    @Ignore //TODO: rewrite
-    void "should return error response with validation error"() {
+    void "should return error response in case of validation error"() {
         def ex = mock(MethodArgumentNotValidException)
-        def BindingResult bindingResult = mock(BindingResult)
-        def fieldError = mock(FieldError)
-        when(ex.getBindingResult()).thenReturn(bindingResult)
-        when(bindingResult.getFieldError()).thenReturn(fieldError)
-        when(fieldError.getDefaultMessage()).thenReturn("CODE|Error message")
+        prepareValidationException(ex)
 
         def errorResponse = handler.processValidationError(ex)
-        assert errorResponse.code == "CODE"
-        assert errorResponse.message == "Error message"
+        assert errorResponse != null
     }
 
     @Test
-    @Ignore //TODO: rewrite
+    void "should return error response with code from validation error"() {
+        def ex = mock(MethodArgumentNotValidException)
+        def fieldError = prepareValidationException(ex)
+        when(fieldError.getDefaultMessage()).thenReturn("ERROR_CODE")
+
+        def errorResponse = handler.processValidationError(ex)
+        assert errorResponse.code == "ERROR_CODE"
+    }
+
+    @Test
+    void "should correctly call MessageSource with validation error code for error message"() {
+        def ex = mock(MethodArgumentNotValidException)
+        def fieldError = prepareValidationException(ex)
+        when(fieldError.getDefaultMessage()).thenReturn("ERROR_CODE")
+
+        handler.processValidationError(ex)
+        verify(msgSource).getMessage("validation.error.ERROR_CODE", null, getLocale())
+    }
+
+    @Test
+    void "should return validation error response with message from messageSource"() {
+        def ex = mock(MethodArgumentNotValidException)
+        def fieldError = prepareValidationException(ex)
+        when(fieldError.getDefaultMessage()).thenReturn("ERROR_CODE")
+        when(msgSource.getMessage("validation.error.ERROR_CODE", null, getLocale()))
+                .thenReturn("Validation error message")
+
+        def errorResponse = handler.processValidationError(ex)
+        assert errorResponse.message == "Validation error message"
+    }
+
+    @Test
     void "should return correct error message in case of AuthProvider creation error"() {
         def ex = mock(HttpMessageNotReadableException)
         when(ex.getMessage()).thenReturn("Message: Unknown value for AuthProvider;")
+        when(msgSource.getMessage("validation.error.INVALID_PROVIDER", null, getLocale()))
+                .thenReturn("AuthProvider creation error message")
 
         def errorResponse = handler.processConvertingError(ex)
+        verify(msgSource).getMessage("validation.error.INVALID_PROVIDER", null, getLocale())
         assert errorResponse.code == "INVALID_PROVIDER"
-        assert errorResponse.message == "Некорректное значение параметра provider"
+        assert errorResponse.message == "AuthProvider creation error message"
     }
 
     @Test
@@ -66,5 +92,13 @@ class ControllerValidationHandlerTest {
         def errorResponse = handler.processConvertingError(ex)
         assert errorResponse.code == "INVALID_REQUEST"
         assert errorResponse.message == "Some error description"
+    }
+
+    def FieldError prepareValidationException(mockedException) {
+        def BindingResult bindingResult = mock(BindingResult)
+        def fieldError = mock(FieldError)
+        when(mockedException.getBindingResult()).thenReturn(bindingResult)
+        when(bindingResult.getFieldError()).thenReturn(fieldError)
+        return fieldError
     }
 }
